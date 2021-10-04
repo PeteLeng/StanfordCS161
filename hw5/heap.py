@@ -17,6 +17,9 @@ class Heap(object):
     def get_key(self, idx):
         return self.tree[idx]
 
+    def has_key(self, key):
+        return key in self.idxs
+
     def get_val(self, idx):
         key = self.get_key(idx)
         return self.vals[key]
@@ -45,6 +48,7 @@ class Heap(object):
                 break
             parent_idx = int((node_idx-1)/2)
             if self.get_val(parent_idx) > self.get_val(node_idx):
+                # print('    - swap parent {} with child {}'.format(parent_idx, node_idx))
                 self.swap(node_idx, parent_idx)
                 node_idx = parent_idx
             else:
@@ -83,10 +87,18 @@ class Heap(object):
     def delete(self, node_key):
         node_idx = self.idxs[node_key]
         last_idx = len(self.tree) - 1
-        self.swap(node_idx, last_idx)
-        self._pop()
-        self.bubble_up(node_idx)
-        self.bubble_down(node_idx)
+        if node_idx == last_idx:
+            self._pop()
+        else:
+            self.swap(node_idx, last_idx)
+            self._pop()
+            self.bubble_up(node_idx)
+            self.bubble_down(node_idx)
+
+    def extract_min(self):
+        min_key, min_value = self.tree[0], self.get_val(0)
+        self.delete(min_key)
+        return min_key, min_value
 
     def get_tree(self):
         return [self.vals[k] for k in self.tree]
@@ -95,17 +107,17 @@ class Heap(object):
         depth = 0
         k = 0
         while k < len(self.tree):
-            i = min(k+2**depth, len(self.tree))
-            print([self.vals[key] for key in self.tree[k:i]])
-            k = i
+            end = min(k+2**depth, len(self.tree))
+            print([self.vals[key] for key in self.tree[k:end]])
+            k = end
             depth += 1
         print('\n')
 
 
 if __name__ == '__main__':
     h1 = Heap()
-    list = [4, 4, 8, 9, 4, 12, 9, 11, 13]
-    for i,v in enumerate(list):
+    l1 = [4, 4, 8, 9, 4, 12, 9, 11, 13]
+    for i, v in enumerate(l1):
         h1.insert(i, v)
     print(h1.get_tree())
     print(h1.vals)
